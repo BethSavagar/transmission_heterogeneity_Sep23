@@ -5,8 +5,8 @@ Repo for published version of transmission heterogeneity manuscript: Cleaned sou
 
 ## Model I: Theoretical Agent-Based Model
 
-`/mod1_IBM`: Contains all model files for Model I
-`/render-all_example_0923.R`: Example render-all script for running model
+- `/mod1_IBM`: Contains all model files for Model I
+- `/render-all_example_0923.R`: Example render-all script for running model
 
 
 ## Model II: PPR Metapopulation Model
