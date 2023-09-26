@@ -1,5 +1,5 @@
 # Continuous IBM function for Model I (26.09.23)
-# takes input and produces proportion infected over time. 
+# An agent-based model simulating transmission of an unspecified, directly transmitted virus in a heterogeneous population
 
 continuousIBM <- function(
     TimeStop, # duration of simulation
@@ -28,7 +28,7 @@ continuousIBM <- function(
   ## Transmission Distributions ##
   ################################
   
-  # Generate transmission distribution and randomly assign transmission potentials to units in the population:
+  # Generate transmission distribution and assign transmission potentials to units in the population:
   dists <- dist_transmission(N,m,k) # generate transmission potential distribution following the negative binomial
   T_dist <- dists[[1]] # transmission distribution
   E_dist <- dists[[2]] # exposure distribution (uniform)
@@ -43,7 +43,7 @@ continuousIBM <- function(
     # Matrix to store the state of each unit in the population over time
     mat <- as.data.frame(matrix(0,nrow = N, ncol = TimeStop+1)) # first col is t=0
   }else{
-    # Matrix to store the number of SIRV or just I (if output == I_counts) over time
+    # Matrix to store the number of SIRV over time
     counts <- as.data.frame(matrix(0,nrow = TimeStop+1, ncol = length(states)))
   }
   
@@ -66,7 +66,8 @@ continuousIBM <- function(
     ############################################################################################################
     ## 2. Generate effective contact IDs:
     ############################################################################################################
-    xInt <- 10^(-DigitsRound) # changed location of this line in hopes it stops breaking 280622 Jun
+    xInt <- 10^(-DigitsRound) 
+    
     # number of effective contacts for current infected units:
     C_num <- T_dist[I0]
     
@@ -366,12 +367,15 @@ continuousIBM <- function(
   ############################################################################################################ 
   
   if(output == "full"){
+    # state of each individual over time
     mat <- mat[, 1:TimeStop]
     return(mat)
   }else if(output == "I_counts"){
+    # number of units in each state over time
     counts <- counts[1:TimeStop, ]
     return(counts[,2])
   }else{
+    # number of units in each state over time
     counts <- counts[1:TimeStop, ]
     return(counts)
   }
