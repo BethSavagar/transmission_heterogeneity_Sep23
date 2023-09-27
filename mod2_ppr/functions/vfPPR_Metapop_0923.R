@@ -82,6 +82,9 @@ mRes[1,"V"] <- sum(V_1+V_2)
 ## START: loop
 for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulation
 		
+  # total number of infected/all units in each  meta-population
+  I_TOT <- 0 
+  N_TOT <- 0 
 	
 	#---------------------------------------------------------
 	# Vaccination ##
@@ -140,10 +143,6 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
   #---------------------------------------------------------
   # Update numbers of animals in each state in Metapop ##
   #---------------------------------------------------------
-  
-  # total number of infected/all units in each  meta-population
-  I_TOT <- 0 
-  N_TOT <- 0 
 	
 	# pX_1, previous (before aging) S,I,R
 	# X_2, X_2 contain number of units in X state in each subpopulation (length = no. sub pops in metapop)
