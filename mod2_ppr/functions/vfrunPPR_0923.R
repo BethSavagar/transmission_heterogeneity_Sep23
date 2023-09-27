@@ -1,5 +1,5 @@
 
-## Function to run PPR metapopulation model: tranmission between units (heterogeneous)
+## Run PPR metapopulation model with transmission within (homogeneous) and between (heterogeneous) units
 
 #####################################################################################
 
@@ -51,22 +51,23 @@ runPPR <- function(Post, # posterior parameters:
   # simulate transmission within the seed unit: iS
   
   ## Return the sum of I/N (used to compute the force of infection and estimate Beta_b
-  Res <- fPPR_OnePop(n,
-                     NInfSeededArea, # number of animals infected within seed unit
-                     MinNoI,
-                     MinNoR,
-                     TimeSteps_OnePop,# number of timesteps for within unit transmission
+  Res <- fPPR_OnePop(
+                     n, # Number of units (sub-populations) in metapop
+                     NInfSeededArea, # number of infected animals within seed unit
+                     MinNoI, # min number infected animals per unit(sub-pop)
+                     MinNoR, # min number recovered animals per unit(sub-pop)
+                     TimeSteps_OnePop, # duration of within-unit transmission simulation (in timesteps)
                      
-                     # within-unit demographic parameters:
-                     Birth,
-                     Exit_1_dt,
-                     Exit_2_dt,
-                     Age_r,
-                     Mort_PPR,
-                     PropAge_1,
-                     PropAge_2,
+                     # Demographic parameters for animals within-unit:
+                     Birth, # birth rate (per timestep?)
+                     Exit_1_dt, # outflow g1
+                     Exit_2_dt, # outflow g2
+                     Age_r, # maturity rate (ageing)
+                     Mort_PPR, # PPR mortality rate
+                     PropAge_1, # proportion age g1
+                     PropAge_2, # proportion age g2
                      
-                     Npop, # number of animals within unit
+                     Npop, # number of animals within seed unit
                      Beta_w # transmission rate within seed unit
                      )
   
@@ -87,33 +88,34 @@ runPPR <- function(Post, # posterior parameters:
   
   # k<-1 ; sum(1-exp(-vBeta_b[k]*Npop*Res*vExp[-k]))
   
-  #mRes is number of animals in each state in metapopulation over time (where timestep = infectious period of unit)
+  # mRes is number of animals in each state in metapopulation over time (where timestep = infectious period of unit)
   
-  mRes <- PPR_Metapop_Heterogeneity(n, 
-                                    nSeeds, 
-                                    NInfSeededArea, 
-                                    MinNoI, 
-                                    MinNoR, 
-                                    Birth,
-                                    Exit_1_dt, 
-                                    Exit_2_dt, 
-                                    Age_r, 
-                                    Mort_PPR, 
-                                    PropAge_1, 
-                                    PropAge_2, 
-                                    Npop, 
-                                    Beta_w, 
-                                    vBeta_b,
-                                    vExp, 
-                                    Timesteps, 
-                                    Freq_ReIntr, 
-                                    TimeLimit_ReIntr, 
-                                    nReIntr,
-                                    
-                                    v_units, # vaccination coverage of units in metapopulation
-                                    v_strat, # c(-4,0,4) targeting of units in metapopualtion
-                                    vaccine_params # parameters for implementing vaccination within units
-                                    )
+  mRes <- PPR_Metapop_Heterogeneity(
+    n, # Number of populations
+    nSeeds, # number of populations where the infection is seeded
+    NInfSeededArea, # number of new infections in a population (when incursion)
+    MinNoI, # minimum number of infected animals, for each population 
+    MinNoR, # minimum number of recovered animals, for each population 
+    Birth, # birth rate (per PERIOD/timestep)
+    Exit_1_dt , # rate at which animals leave the "0-1 year old" compartment (per PERIOD/timestep)
+    Exit_2_dt , # rate at which animals leave the ">1 year old" compartment (per PERIOD/timestep)
+    Age_r , # Ageing: rate at which units move from group 1 - 2 in a given timestep
+    Mort_PPR , # mortality risk from PPR infection
+    PropAge_1, # proportion of animals in 1st age category
+    PropAge_2, # proportion of animals in 2nd age category
+    Npop, # size of a population (number of animals in a given sub-population)
+    Beta_w, # transmission rate (within a sub-population)
+    vBeta_b, # transmission rate (between sub-populations)
+    vExp, # Exposure probability (between populations)
+    Timesteps, # Number of timesteps to simulate transmission within metapopulation
+    Freq_ReIntr, # Frequency of re-introduction (of seed infections in metapopulation)
+    TimeLimit_ReIntr, # Time limit for re-introduction (of seed infections in metapop)
+    nReIntr, # Number of populations within which infected animals are re-introduced
+    
+    v_units, # vaccination coverage of units in metapopulation
+    v_strat, # c(-4,0,4) targeting of units in metapopualtion
+    vaccine_params # parameters for implementing vaccination within units
+    )
   
   if(output == "counts"){
     return(mRes)

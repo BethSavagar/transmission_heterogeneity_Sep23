@@ -90,34 +90,37 @@ for(i in 1:nrow(params)){
   Runs_tracker <-
     foreach (z = 1:runs, .combine = "rbind") %dopar% {
       runPPR( # output of runPPR is an incidence within the metapopulation
-        Post,
-        n,
-        NInfSeededArea,
-        MinNoI,
-        MinNoR,
-        TimeSteps_OnePop,
-        Birth,
-        Exit_1_dt,
-        Exit_2_dt,
-        Age_r,
-        Mort_PPR,
-        PropAge_1,
-        PropAge_2,
-        Npop,
-        Beta_w,
-        nSeeds,
-        Timesteps,
-        Freq_ReIntr,
-        TimeLimit_ReIntr,
-        nReIntr,
-        k_estimate,
-        output,
+        
+        Post, # posterior parameters:
+        n, # number of units (sub-pops) in metapopulation
+        NInfSeededArea, # number of infected animals in seed unit (subpopulation)
+        MinNoI, # minimum number infected within unit
+        MinNoR, # minimum number recovered within unit
+        TimeSteps_OnePop, # number of timeteps for within population transmission
+        
+        # within-unit demographic params
+        Birth, # birth rate within subpop(equal throughout metapop)
+        Exit_1_dt, # survival rate in group 1
+        Exit_2_dt, # survival rate in gorup 2
+        Age_r, # maturity rate 
+        Mort_PPR, # ppr mortality
+        PropAge_1, # proportion of animals in age group 1 (within sub pop)
+        PropAge_2, # proportion of animals in age group 2 (within sub pop
+        
+        Npop, # number of animals in sub-pop (unit)
+        Beta_w, # transmission rate within unit (sub-pop)
+        nSeeds, # number of seed units (initial)
+        Timesteps, # timesteps for metapopulation tranmission (where 1 TS = animal infection period, 10 days)
+        Freq_ReIntr, # frequency of reseeding infection in metapopulation
+        TimeLimit_ReIntr, # upper timelimit for reseeding events
+        nReIntr, # number of units infected at reseeding event
+        k_estimate, # k value 
+        output, # formt of output:
         
         v_units, # vaccination coverage of units in metapopulation
         v_strat, # c(-4,0,4) targeting of units in metapopualtion
         vaccine_params # parameters for implementing vaccination within units
-      )
-      
+        )
     }
   
   # Proportion Endemicity: 
