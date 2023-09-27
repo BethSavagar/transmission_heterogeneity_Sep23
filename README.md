@@ -11,6 +11,8 @@ Repo for published version of transmission heterogeneity manuscript: Cleaned sou
 
 ## Model II: PPR Metapopulation Model
 
-`/mod2_ppr`: Contains all model files for Model II
+- `/mod2_ppr`: Contains all model files for Model II
+- `/render_mod2_0923.R`: Example render-all script for running model with vaccination over 4 timesteps
+- `/render_all_example_mod2_v12_0923.R`: Sensitivity analysis for model with vaccination over 12 timesteps
 
 
