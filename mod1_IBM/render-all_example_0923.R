@@ -19,13 +19,11 @@ source(paste0(mod_filepath, "/functions/TEdists.R")) # dist and dist_transmissio
 source(paste0(mod_filepath, "/functions/R0calc.R")) # R0calc
 source(paste0(mod_filepath, "/functions/pEndemicity.R")) # Vendemicity
 
-
 ##################
 ## PARAMETERS ##
 ##################
-
 source(paste0(mod_filepath,"/data-parameters/fixed-pars.R")) 
-#on local machine see CLEAN/sims_update_Nov22 & sims_update_Jul23
+
 
 ##################
 ## MODEL SETUP ##
@@ -40,7 +38,16 @@ output <- "I_counts" # "Counts" for SIRV counts, I_counts for only Infecteds
 epi_List <- vector(mode = "list", length = nrow(params)) # List to store output fo
 
 # Simulation: 
-runs <- 5e3 # up to 1000 once running effectively
+runs <- 5e3 # number of iterations per scenario
+
+# Set-up for running simulations in parallel: 
+#
+#
+#
+
+##################
+## RUN MOD ##
+##################
 
 # Loop through each scenario: 
 for(i in 1:nrow(params)){
@@ -83,7 +90,7 @@ for(i in 1:nrow(params)){
       )
     }
 
-  # Proportion Endmeicity: 
+  # Proportion Endemicity: 
     # - calculate the proportion of simulations that are endemic at time of vaccination (V_schedule-2), but extinct at end of simulation. 
   pEndemic <- Vendemicity(Runs_tracker, TimeStop, V_schedule - 2) 
   
@@ -95,8 +102,8 @@ for(i in 1:nrow(params)){
 }
 
 
-
+# Save completed output:
 tdate <- Sys.Date()
 filename <- paste0("output_mod1_", tdate, ".csv")
 
-write.csv(params, paste0(mod_filepath, "/outputs/", filename))
+write.csv(params, paste0(mod_filepath, "/output/", filename))
