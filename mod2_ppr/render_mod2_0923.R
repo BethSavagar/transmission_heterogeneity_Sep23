@@ -19,9 +19,9 @@ library(reshape2)
 library(here)
 
 # load functions
+source(paste0(mod_filepath, "/functions/vfrunPPR_0923.R")) # run model with transmission within and between units
 source(paste0(mod_filepath, "/functions/fPPR_OnePop_0923.R")) # simulates transmission within a unit (sub-population)
 source(paste0(mod_filepath, "/functions/vfPPR_Metapop_0923.R")) # simulate transmission between units (meta-pop), with vaccination.
-source(paste0(mod_filepath, "/functions/vfrunPPR_0923.R")) # run model with transmission within and between units
 source(paste0(mod_filepath, "/functions/fVacc_Metapop_0923.R")) # vaccination
 source(paste0(mod_filepath, "/functions/pEndemicity_ppr.R")) # calc. endemicity
 
