@@ -19,16 +19,17 @@
 #' ### Function
 #' #########################################################################################################
 #'
-vaccination <- function(T_dist, 
-                        E_dist, 
-                        V_prop, 
-                        V_exp){
+vaccination <- function(T_dist, # transmission distribution
+                        E_dist, # exposure distribution
+                        V_prop, # proportion vaccinated
+                        V_exp){ # vaccine exponent (strategy) 
   
-#V_exp == 0 is random vaccination, v_exp >0 is positive targeting, v_exp < 0 is negative targeting (convenience)
-    N <- length(T_dist)
+  #V_exp == 0 is random vaccination, v_exp >0 is positive targeting, v_exp < 0 is negative targeting (convenience)
+    
+  N <- length(T_dist) # pop size
  
-    vTI <- T_dist +1
-    vEI <- E_dist +1
+    vTI <- T_dist +1 
+    vEI <- E_dist +1 
     
     v <- vTI /sum(vTI) * vEI/sum(vEI)
     v <- v/sum(v)

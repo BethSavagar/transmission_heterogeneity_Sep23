@@ -36,7 +36,7 @@ Surv_PPR_2 <- 1 - Mort_PPR
 
 # v_counter <- 1
 
-I_VTOT <- rep(0,n) # total infected animals in units in metapop?
+I_VTOT <- rep(0,n) # total infected animals in units in metapop
 
 Decrease <- rep(0,n)
 Increase <- rep(0,n)
@@ -46,7 +46,7 @@ Npop_1 <- Npop * PropAge_1 # number of animals in age group 1
 Npop_2 <- Npop * PropAge_2 # number of animals in age group 2
 
 ## Number of births
-nBirths <- Birth * Npop_2 # number of births per timestep (or period?), birth rate * number mature animals
+nBirths <- Birth * Npop_2 # number of births , birth rate * number mature animals
 
 # state vectors contain number of animals in each state, within each unit in the metapop
 # all units are susceptible at time = 0
@@ -82,41 +82,35 @@ mRes[1,"V"] <- sum(V_1+V_2)
 ## START: loop
 for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulation
 		
-  #---------------------------------------------------------
-  # Update numbers of animals in each state in Metapop ##
-  #---------------------------------------------------------
-
-  # total number of infected/all units in each  meta-population
-	I_TOT <- 0 # set total infected to 0 
-	N_TOT <- 0 # set pop to 0?
 	
-	# Vaccination?
+	#---------------------------------------------------------
+	# Vaccination ##
+	#---------------------------------------------------------
 	
-	# Vaccination - see work on vaccination.R
-	# source("work on vaccination dev.R")
-	# Aug 23: Update vaccination to sample vaccinated units over longer timeframe
-	
+	# Sample units for vaccination 
+	# If vaccination timestep -->
 	if(Timestep %in% vaccine_params[,"v_start"]){
-	  v_round <- vaccine_params %>% filter(v_start == Timestep) %>% pull(rounds)
-	  v_group <- vaccine_params %>% filter(v_start == Timestep) %>% pull(v_group)
-	  # first vaccination timestep --> Sample units for vaccinating 
+	  v_round <- vaccine_params %>% filter(v_start == Timestep) %>% pull(rounds) # vaccination round
+	  v_group <- vaccine_params %>% filter(v_start == Timestep) %>% pull(v_group) # group to vaccinate
+
+	  # first vaccination timestep --> Sample units to be vaccinated (same for subsequent rounds)
 	  if(v_round ==1 & Timestep==min(vaccine_params[,"v_start"])){
-	    wVacc_all <- vaccination(vBeta_b, vExp, v_units, v_strat) 
-	    wVacc_split <- sample(wVacc_all, replace = F) %>% # sample the list of vaccine IDs to randomise
-	      split(.,1:4)
+	    wVacc_all <- vaccination(vBeta_b, vExp, v_units, v_strat) # units to be vaccinated
+	    wVacc_split <- sample(wVacc_all, replace = F) %>% split(.,1:4) # divide into 4 groups for sequential vaccination
 	      
-	    # split vaccine ids into groups for vaccination over 4-8weeks
+	    # split vaccine ids into groups for vaccination over 4 timesteps
 	    wVacc_A <- wVacc_split$`1` 
 	    wVacc_B <- wVacc_split$`2` 
 	    wVacc_C <- wVacc_split$`3`
 	    wVacc_D <- wVacc_split$`4`
 	  }
+	  
 	  ## END vaccination sampling
 	  
-	  ## Vaccination rounds: 
+	  ## Proportion vaccinated: 
 	  
-	  pA <- vaccine_params %>% filter(v_start == Timestep) %>% pull(pA)
-	  pY <- vaccine_params %>% filter(v_start == Timestep) %>% pull(pY)
+	  pA <- vaccine_params %>% filter(v_start == Timestep) %>% pull(pA) # proportion adults vaccinated
+	  pY <- vaccine_params %>% filter(v_start == Timestep) %>% pull(pY) # proportion young vaccinated
 	  
 	  if(v_group == "A"){
 	    wVacc <- wVacc_A
@@ -128,6 +122,7 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 	    wVacc <- wVacc_D
 	  }
 	  
+	  # Update states:
 	  # V <- S+I+R
 	  V_1[wVacc] <- V_1[wVacc]+(pY*(S_1[wVacc]+I_1[wVacc]+R_1[wVacc]))
 	  V_2[wVacc] <- V_2[wVacc]+(pA*(S_2[wVacc]+I_2[wVacc]+R_2[wVacc]))
@@ -142,7 +137,15 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 	  R_2[wVacc] <- ((1-pA)*(R_2[wVacc]))
 	}
 
-	#pX_1, previous (before aging) S,I,R
+  #---------------------------------------------------------
+  # Update numbers of animals in each state in Metapop ##
+  #---------------------------------------------------------
+  
+  # total number of infected/all units in each  meta-population
+  I_TOT <- 0 
+  N_TOT <- 0 
+	
+	# pX_1, previous (before aging) S,I,R
 	# X_2, X_2 contain number of units in X state in each subpopulation (length = no. sub pops in metapop)
 	pS_1 <- S_1 
 	pS_2 <- S_2
@@ -160,13 +163,13 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 	nV_Temp <- pV_1 + pV_2
 	nN_Temp <- nS_Temp + nI_Temp + nR_Temp + nV_Temp # population size of each sub-population
 
-	#identify which subpopulations are infected
+	# identify which subpopulations are infected
 	wInfe <- nI_Temp>0 
 	wSusc <- nI_Temp==0
 
-	#update total number of infected animals in all units in metapopulation
+	# update total number of infected animals in all units in metapopulation
 	I_TOT  <- sum(nI_Temp)
-	#update total number of animals in all units in metapopulation
+	# update total number of animals in all units in metapopulation
 	N_TOT  <- sum(nN_Temp)
 
 	# Replace nR with 0 if number of animals in R state is <MinNoR in a given unit
@@ -204,17 +207,17 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 	aV_1 <- aV_1 - Age_V_1
 	aV_2 <- Remain_2_dt * pV_2 + Age_V_1
 	
-	#	Number of reproductive animals in each unit. (age G2 and not infected)
+	#	Number of reproductive animals in each unit. (age group 2 and not infected)
 	pN_Reprod <- pS_2 + pR_2 + pV_2
 
 	#---------------------------------------------------------
 	# Transmission processes within units ##
 	#---------------------------------------------------------
 	
-	# Infection rate for animals within units
+	# Infection risk for animals within units
 	ProbaInf <- 1 - exp(-Beta_w*nI_Temp/nN_Temp)
 
-	# numbre of newly infected animals in each unit in metapopulation
+	# number of newly infected animals in each unit in metapopulation
 	NewInf_1 <- ProbaInf * aS_1
 	NewInf_2 <- ProbaInf * aS_2
 
@@ -280,8 +283,6 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 	wSusc <- which((I_1+I_2)==0) # Units in susceptible state (no infections)
 	nSusc <- length(wSusc) # Number of susceptible units
 	
-  ## Vaccination??
-	
 	if(nSusc>0){
 	  # total force of infection for all units
 		foi_TOT <- (sum(vBeta_b*nI_Temp)-vBeta_b*nI_Temp) * vExp / (N_TOT-nN_Temp)
@@ -292,12 +293,11 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 		# random number allocated to each susceptible sub-pop to determine new infections
 		RndNumber <- runif(nSusc,0,1)
 		# generate new infections within susceptible subpopulations depending on probability of infection
-		
 		# if random number < infection risk then seed new infections.
 		I_2[wSusc][RndNumber<ProbaInf_b] <- NInfSeededArea 	# update number of infected animals in new infected units
 		S_2[wSusc][RndNumber<ProbaInf_b] <- S_2[wSusc][RndNumber<ProbaInf_b]-NInfSeededArea # update number of susceptible animals in new infected units
 		
-		S_2[wSusc][RndNumber<ProbaInf_b][ S_2[wSusc][RndNumber<ProbaInf_b] < 0 ] <- 0 #????????
+		S_2[wSusc][RndNumber<ProbaInf_b][ S_2[wSusc][RndNumber<ProbaInf_b] < 0 ] <- 0
 	}
 
 	#---------------------------------------------------------
@@ -306,7 +306,7 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 	## Re-seeding of infected units at metapopulation level
 	# if timestep = timestep of seed events and < reseed threshold
 	if(Timestep%%Freq_ReIntr==0 & Timestep<TimeLimit_ReIntr){
-	  # which populations are susceptible?
+	  # which populations have no infections
 		wSusc <- which((I_1+I_2)==0)
 		# number of introductions limited by number of susceptible populations
 		nSusc_Intr <- min(length(wSusc),nReIntr)
@@ -332,6 +332,7 @@ for(Timestep in 1:Timesteps){ # for current timestep in metapopulation simulatio
 }
 ## End: day loop
 
+# Return mRes
 mRes
 
 }
