@@ -117,6 +117,8 @@ runPPR <- function(Post, # posterior parameters:
     vaccine_params # parameters for implementing vaccination within units
     )
   
+  # Output 
+  
   if(output == "counts"){
     return(mRes)
   }else if(output == "I_counts"){
